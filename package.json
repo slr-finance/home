@@ -7,11 +7,9 @@
     "preview": "nuxt preview"
   },
   "devDependencies": {
-    "@types/three": "0.139.0",
     "nuxt": "3.0.0-rc.1"
   },
   "dependencies": {
-    "@vueuse/core": "^8.3.1",
-    "three": "0.139.2"
+    "@vueuse/core": "^8.3.1"
   }
 }
