@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="canvasRef" style="width: 100%; height: 500px;"/>
+  <canvas ref="canvasRef" class="bg-black"/>
 </template>
 
 <script lang="ts">
@@ -14,7 +14,7 @@ const bgGlowColor = '#101010'
 
 let pixelRatio = 1
 
-if (process.client) {
+if (typeof window !== 'undefined') {
   pixelRatio = window.devicePixelRatio || 1
 }
 
@@ -43,8 +43,12 @@ const drawStaticLayer = (ctx:CanvasRenderingContext2D, width: number, height: nu
   }
 
   /// create horizontal lines
-  for(let index = 0; index <= Math.ceil(height / fovY); index+=1) {
-    const y = fovY * index * index * index / 55
+  let y = 0
+  let rowIndex = 0
+  
+  while(y < height) {
+    y += fovY + rowIndex * 15
+    rowIndex++
     ctx.moveTo(0, y)
     ctx.lineTo(width, y)
   }
@@ -115,8 +119,8 @@ export default defineComponent({
     let ctx:null|CanvasRenderingContext2D = null
     let canvasEl:null|HTMLCanvasElement = null
     let cols = 0
-    let perspectiveRate = 5.5
-    let fovX = 145
+    let perspectiveRate = 4
+    let fovX = 265
     let centerX = Math.ceil(width / 2)
 
     useResizeObserver(canvasRef, ([entry]) => {

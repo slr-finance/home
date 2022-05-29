@@ -1,21 +1,65 @@
 <template>
-  <home-bg/>
-  <div class="text-box">
-    <div class="heading">Slr.Finance</div>
-    <div class="button-wrapper">
-        <a href="https://app.slr.finance" class="button">Launch app</a>
-        <a href="https://docs.slr.finance" class="button">Docs</a>
+  <app-header is-desktop/>
+
+  <div class="relative pt-ui-page-header-spacing pb-80">
+    <home-bg class="absolute left-0 top-0 w-full h-full"/>
+    <div
+      class="relative z-1 px-ui-page-spacing"
+      style="max-width: 770px"
+    >
+      <h1 class="text-60 text-gray font-title leading-140 uppercase mb-24 inline-block relative">
+        DeFi 3.0 planets system with 
+        <span class="text-white">invest & burning</span>
+        <ui-poligon
+          animated
+          size="64"
+          variant="green-atomic"
+          class=" absolute right-0 top-0 transform translate-x-1/2 -translate-y-1/2"
+        >
+          Presale
+        </ui-poligon>
+      </h1>
+
+      <p class="text-gray text-20 mb-36">
+        Revolutionary financial protocol operating in BSC with Auto-Compounding, Auto-Liquidity mechanisms, Auto-Investing and limitless buyback.
+      </p>
+
+      <div class="inline-grid grid-cols-2 gap-12">
+        <ui-button
+          size="48"
+          variant="violet"
+          href="https://app.slr.finance/presale"
+        >
+          Join in presale whitelist
+        </ui-button>
+
+        <ui-button
+          size="48"
+          variant="gray"
+          href="https://app.slr.finance/referral"
+        >
+          Referral program
+        </ui-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import './index.postcss'
+import './components/ui/index.postcss'
+import AppHeader from './components/App/AppHeader.vue'
 import HomeBg from './components/HomeBg.vue'
+import UiButton from './components/ui/UiButton.vue'
+import UiPoligon from './components/ui/UiPoligon.vue'
 
 export default defineComponent({
   components: {
     HomeBg,
+    AppHeader,
+    UiButton,
+    UiPoligon,
   }
 })
 </script>
