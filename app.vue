@@ -8,7 +8,7 @@
         class="relative z-1"
         style="max-width: 770px"
       >
-        <h1 class="text-60 text-gray font-title leading-140 uppercase mb-24 inline-block relative">
+        <h1 class="text-60 text-gray font-title leading-140 uppercase mb-24 inline-block relative selection:bg-green-atomic selection:bg-opacity-50 selection:text-white">
           DeFi 3.0 planets system with 
           <span class="text-white">invest & burning</span>
           <ui-poligon
@@ -21,7 +21,7 @@
           </ui-poligon>
         </h1>
   
-        <p class="text-gray text-20 mb-36">
+        <p class="text-gray text-20 mb-36 selection:bg-green-atomic selection:text-black">
           Revolutionary financial protocol operating in BSC with Auto-Compounding, Auto-Liquidity mechanisms, Auto-Investing and limitless buyback.
         </p>
   

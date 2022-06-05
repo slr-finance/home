@@ -1,13 +1,16 @@
 <template>
-  <div ref="svg">
-    <svg v-bind="svgData.svgAttrs">
+  <div ref="root">
+    <svg
+      ref="svg"
+      class="w-full h-full"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
-        :d="svgData.d"
+        ref="path"
         fill="none"
-        stroke-width="12px"
+        :stroke-width="`${strokeWidth}px`"
         stroke-linecap="round"
-        stroke-dasharray="1000"
-        stroke-dashoffset="1000"
       />
     </svg>
   </div>
@@ -15,7 +18,7 @@
 
 <script lang="ts">
 import { templateRef, useResizeObserver } from '@vueuse/core'
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, ref, Ref, watch } from 'vue'
 
 class SvgPath {
   private path:string = ''
@@ -101,7 +104,7 @@ class SvgPath {
       throw new Error(`[SvgPath.moveTo]: incorrect points \n${JSON.stringify(points)}`)
     }
     
-    this.path = `${this.path} ${modifier} ${points.map((point, index) => point +(index % 2 === 0 ? this.offset.l : this.offset.t)).join(' ')}`
+    this.path = `${this.path} ${modifier} ${points.map((point, index) => point + (index % 2 === 0 ? this.offset.l : this.offset.t)).join(' ')}`
     this.lastX = points[length - 2]
     this.lastY = points[length - 1]
 
@@ -111,64 +114,82 @@ class SvgPath {
 
 export default defineComponent({
   name: 'landing-svg-road',
-  setup() {
-    const svgRef = templateRef('svg')
+  props: {
+    strokeWidth: {
+      type: Number,
+      default: 1,
+    }
+  },
+  setup(props) {
+    const pathRef = templateRef('path') as Readonly<Ref<SVGPathElement>>
+    const svgRef = templateRef('svg') as Readonly<Ref<SVGElement>>
+    const rootRef = templateRef('root')
     const svgSize = ref({ width: 0, height: 0 })
   
-    useResizeObserver(svgRef, ([entry]) => {
+    useResizeObserver(rootRef, ([entry]) => {
       svgSize.value = {
         width: entry.contentRect.width,
         height: entry.contentRect.height,
       }
     })
 
-    const svgData = computed(() => {
-      const svgSizeVal = svgSize.value
-      const svgOffsetX = 12
-      const treeColSpace = 100
-      const width = svgSizeVal.width - svgOffsetX
-      const angleSize = 50
-      const topOffset = 80
-      const treeCollWidth = width / 3
-      const treeCollCenter = treeCollWidth / 2
+    watch(
+      [svgSize, () => props.strokeWidth],
+      ([{ width, height }, strokeWidth], oldVal, onCleanup) => {
+        const [{ value: pathEl }, { value: svgEl }] = [pathRef, svgRef]
 
-      const firstBlocksSpace = 800
+        if (!pathEl || !svgEl) {
+          return
+        }
 
-      const d = new SvgPath()
-        .setOffset(treeCollCenter, topOffset)
+        // [BEGIN] Build path
+        const svgSizeVal = svgSize.value
+        const treeColSpace = 100
+        const areaWidth = svgSizeVal.width - strokeWidth / 2
+        const angleSize = 50
+        const topOffset = 80
+        const treeCollWidth = width / 3
+        const treeCollCenter = treeCollWidth / 2
 
-        .m(0, 0)
-        .l(0, treeColSpace - angleSize)
-        .q(2, angleSize, treeColSpace)
-        .l(treeCollWidth + angleSize, treeColSpace)
+        const firstBlocksSpace = 800
 
-        .m(treeCollWidth, 0)
-        .l(treeCollWidth, treeColSpace - angleSize)
-        .q(2, treeCollWidth + angleSize, treeColSpace)
-        .l(treeCollWidth + treeCollWidth + angleSize, treeColSpace)
+        const d = new SvgPath()
+          .setOffset(treeCollCenter, topOffset)
 
-        .m(treeCollWidth + treeCollWidth, 0)
-        .l(treeCollWidth + treeCollWidth, treeColSpace - angleSize)
-        .q(2, treeCollWidth + treeCollWidth + angleSize, treeColSpace)
+          .m(0, 0)
+          .l(0, treeColSpace - angleSize)
+          .q(2, angleSize, treeColSpace)
+          .l(treeCollWidth + angleSize, treeColSpace)
 
-        .setOffset(0, topOffset)
+          .m(treeCollWidth, 0)
+          .l(treeCollWidth, treeColSpace - angleSize)
+          .q(2, treeCollWidth + angleSize, treeColSpace)
+          .l(treeCollWidth + treeCollWidth + angleSize, treeColSpace)
 
-        .l(width - angleSize, treeColSpace)
-        .q(1, width, treeColSpace + angleSize)
-        .l(width, firstBlocksSpace - angleSize - angleSize)
+          .m(treeCollWidth + treeCollWidth, 0)
+          .l(treeCollWidth + treeCollWidth, treeColSpace - angleSize)
+          .q(2, treeCollWidth + treeCollWidth + angleSize, treeColSpace)
 
-        .q(3, width - angleSize, firstBlocksSpace - angleSize)
-      .toString()
+          .setOffset(0, topOffset)
 
-      const svgAttrs = {
-        width: `${svgSizeVal.width}`,
-        height: `${svgSizeVal.height}`,
+          .l(areaWidth - angleSize, treeColSpace)
+          .q(1, areaWidth, treeColSpace + angleSize)
+          .l(areaWidth, firstBlocksSpace - angleSize - angleSize)
+
+          .q(3, areaWidth - angleSize, firstBlocksSpace - angleSize)
+        .toString()
+        // [END] Build path
+
+        pathEl.setAttribute('d', d)
+
+        const totalLength = pathEl.getTotalLength().toString()
+
+        pathEl.setAttribute('stroke-dasharray', totalLength)
+        pathEl.setAttribute('stroke-dashoffset', totalLength)
+
+        svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`)
       }
-
-      return { d, svgAttrs }
-    })
-
-    return { svgData }
+    )
   },
 })
 </script>

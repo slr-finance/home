@@ -9,7 +9,10 @@
       <div class="h-80 bg-gray-800 rounded-12">2</div>
       <div class="h-80 bg-gray-800 rounded-12">3</div>
     </div>
-    <landing-svg-road class="absolute inset-0 w-full h-full"/>
+    <landing-svg-road
+      class="absolute inset-0 w-full h-full"
+      :stroke-width="10"
+    />
   </div>
 </template>
 
