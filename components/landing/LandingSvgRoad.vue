@@ -26,56 +26,86 @@ class SvgPath {
   constructor(x:number = 0, y:number = 0) {
     this.path = `M ${x} ${y}`
   }
-  q(a:0|1|2|3, toX:number, toY:number) {
+  
+  /**
+   * Рисует дугу
+   * 
+   * номера углов:  
+   *   0|1
+   *   ---
+   *   2|3
+   */
+  public q(a:0|1|2|3, toX:number, toY:number) {
     let lx:number
     let ly:number
-    if (a == 2) {
-      lx = this.lastX
-      ly = toY
-    } else if (a == 1) {
-      lx = toX
-      ly = this.lastY
-    } else if (a == 3) {
-      lx = this.lastX
-      ly = toY
+    
+    switch (a) {
+      case 0: {
+        throw new Error('[SvgPath]: not implemented')
+        break  
+      }
+      case 1: {
+        lx = toX
+        ly = this.lastY
+        break
+      }
+      case 2: {
+        lx = this.lastX
+        ly = toY
+        break
+      }
+      case 3: {
+        lx = this.lastX
+        ly = toY
+        break
+      }
+      default:{
+        throw new Error('[SvgPath.q]: unknown props "a"')
+      }
     }
 
-    this.path = `${this.path} Q ${lx + this.offset.l} ${ly + this.offset.t} ${toX + this.offset.l} ${toY + this.offset.t}`
-    this.lastX = toX
-    this.lastY = toY
-
-    return this
+    return this.moveTo('Q', lx, ly, toX, toY)
   }
 
-  l(toX:number, toY:number) {
-    this.path = `${this.path} L ${toX + this.offset.l} ${toY + this.offset.t}`
-    this.lastX = toX
-    this.lastY = toY
-
-    return this
+  /**
+   * Проводит линию от курсора к указанным координатам
+   */
+  public l(toX:number, toY:number) {
+    return this.moveTo('L', toX, toY)
   }
 
-  m(toX:number, toY:number) {
-    this.path = `${this.path} M ${toX + this.offset.l} ${toY + this.offset.t}`
-    this.lastX = toX
-    this.lastY = toY
-
-    return this
+  /**
+   * Перемещает курсор
+   */
+  public m(toX:number, toY:number) {
+    return this.moveTo('M', toX, toY)
   }
 
   /**
    * все создаваемые точки после вызова этого метода будут смещены по x на l, а по y на t.
    * Что бы сборсить смещение вызови метод c нулями setOffset(0, 0)
    */
-  setOffset(l: number, t: number) {
+  public setOffset(l: number, t: number) {
     this.offset.l = l
     this.offset.t = t
 
     return this
   }
 
-  toString() {
-    return this.path
+  public toString() { return this.path }
+
+  private moveTo(modifier: 'M'|'L'|'Q', ...points:number[]) {
+    const length = points.length
+
+    if (length % 2 !== 0 || length < 2) {
+      throw new Error(`[SvgPath.moveTo]: incorrect points \n${JSON.stringify(points)}`)
+    }
+    
+    this.path = `${this.path} ${modifier} ${points.map((point, index) => point +(index % 2 === 0 ? this.offset.l : this.offset.t)).join(' ')}`
+    this.lastX = points[length - 2]
+    this.lastY = points[length - 1]
+
+    return this
   }
 }
 
