@@ -7,7 +7,7 @@
     <div class="px-ui-page-spacing">
       <div
         class="relative z-1 mt-48"
-        style="max-width: 770px"
+        style="max-width: 700px"
       >
         <h1 class="text-60 text-gray font-title leading-140 uppercase mb-24 inline-block relative selection:bg-green-atomic selection:bg-opacity-50 selection:text-white">
           DeFi 3.0 planets system with 

@@ -173,7 +173,7 @@ export default defineComponent({
 
     if (typeof window !== undefined) {
       window.addEventListener('scroll', (e) => {
-        fovY = 40 * (1 - Math.min(1, (window.scrollY) / height))
+        fovY = 40 * (1 - Math.min(1, window.scrollY / (height / 1.5)))
       })
     }
 

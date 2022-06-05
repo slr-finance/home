@@ -1,13 +1,7 @@
 <template>
-  <client-only>
-    <app-header is-desktop/>
-  </client-only>
-
-  <home-hero/>
-
-  <div class="mx-ui-page-spacing">
-    <home-milky-way-scheme/>
-  </div>
+  <nuxt-layout>
+    <nuxt-page/>
+  </nuxt-layout>
 </template>
 
 <script lang="ts">
@@ -16,14 +10,6 @@ import 'virtual:svg-icons-register'
 import { defineComponent } from 'vue'
 import './index.postcss'
 import './components/ui/index.postcss'
-import UiButton from './components/ui/UiButton.vue'
-import UiPoligon from './components/ui/UiPoligon.vue'
 
-export default defineComponent({
-  layout: 'default',
-  components: {
-    UiButton,
-    UiPoligon,
-  }
-})
+export default defineComponent({ name: 'app' })
 </script>

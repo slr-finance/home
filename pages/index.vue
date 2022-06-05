@@ -1,12 +1,10 @@
 <template>
-  <client-only>
-    <app-header is-desktop/>
-  </client-only>
+  <div>
+    <home-hero/>
 
-  <home-hero/>
-
-  <div class="mx-ui-page-spacing">
-    <home-milky-way-scheme/>
+    <div class="mx-ui-page-spacing">
+      <home-milky-way-scheme/>
+    </div>
   </div>
 </template>
 

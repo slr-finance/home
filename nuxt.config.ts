@@ -5,6 +5,10 @@ import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
   target: 'static', // default is 'server'
+  generate: {
+    fallback: '404.html',
+    manifest: true
+  },
   modules: ['@nuxtjs/tailwindcss'],
   vite: {
     plugins: [

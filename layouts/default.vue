@@ -3,5 +3,5 @@
     <app-header />
   </client-only>
   
-  <nuxt />
+  <slot/>
 </template>
