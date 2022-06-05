@@ -1,41 +1,44 @@
 <template>
   <header
-    class="app-header px-ui-page-spacing z-header pt-32 flex"
+    class="app-header fixed z-header top-0 left-0 w-full px-ui-page-spacing pt-32 selection:bg-green-atomic selection:text-black"
     :class="{ '-mobile': !isDesktop }"
   >
-    <div class="app-header-bg backdrop-blur-8 absolute top-0 left-0 w-full h-full z-0 bg-black bg-opacity-50" />
-    <slot
-      v-if="isDesktop"
-      name="desktop-logo"
-    />
-    <slot
-      v-else
-      name="mobile-logo"
-    />
+    <div class="app-header-bg backdrop-blur-8 absolute top-0 left-0 w-full h-full z-0 bg-black bg-opacity-30" />
+    <div class="flex items-center relative z-10 w-full h-full">
+      <slot
+        v-if="isDesktop"
+        name="desktop-logo"
+      />
+      <slot
+        v-else
+        name="laptop-logo"
+      />
 
-    <ul class="relative z-10 flex-1 flex space-x-32 h-full">
-      <li
-        class="h-full"
-        v-for="link in links"
-      >
-        <ui-link
-          class="ui-link text-14 flex flex-col justify-center items-center leading-none h-full"
-          v-bind="link"
-        />
-      </li>
-      <li class="h-full flex flex-1 justify-end">
-        <ui-link
-          class="text-14 flex flex-col justify-center items-center leading-none h-full"
-          href="https://docs.slr.finance"
-          rel="noopener noreferrer"
+      <ul class="ml-18 flex-1 flex space-x-32 h-full">
+        <li
+          class="h-full"
+          :key="index"
+          v-for="(link, index) in links"
         >
-          Knowledge base
-        </ui-link>
-      </li>
-    </ul>
+          <ui-link
+            class="ui-link text-14 flex flex-col justify-center items-center leading-none h-full"
+            v-bind="link"
+          />
+        </li>
+        <li class="h-full flex flex-1 justify-end">
+          <ui-link
+            class="text-14 flex flex-col justify-center items-center leading-none h-full"
+            href="https://docs.slr.finance"
+            rel="noopener noreferrer"
+          >
+            Knowledge base
+          </ui-link>
+        </li>
+      </ul>
 
-    <div class="relative z-10 ml-16">
-      <slot name="action"/>
+      <div class="relative z-10 ml-16">
+        <slot name="action"/>
+      </div>
     </div>
   </header>
 </template>
@@ -45,7 +48,7 @@
   // import AppHeaderLogo from './AppHeaderLogo.vue'
   // import ConnectWallet from '@/components/ConnectWallet/ConnectWallet.vue'
   import { useStyleTag, useBreakpoints, useEventListener } from '@vueuse/core'
-  import UiLink, { UiLinkProps } from './UiLink.vue'
+  import UiLink, { UiLinkProps } from '../UiLink.vue'
   // import AppHeaderDesktopNav from './AppHeaderDesktopNav.vue'
   // import AppHeaderMobileMenu from './AppHeaderMobileMenu.vue'
 
@@ -133,7 +136,6 @@
   }
 
   .app-header {
-    @apply flex fixed top-0 left-0 w-full items-center;
     transform: translateY(calc(var(--app-ui-header-scroll-factor) * var(--app-ui-header-scroll-padding) * -1));
     height: calc(var(--app-ui-header-base-height) + var(--app-ui-header-scroll-padding));
     padding-top: var(--app-ui-header-scroll-padding);

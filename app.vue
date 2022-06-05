@@ -1,5 +1,7 @@
 <template>
-  <app-header is-desktop/>
+  <client-only>
+    <app-header is-desktop/>
+  </client-only>
 
   <div class="relative pt-ui-page-header-spacing pb-80">
     <home-bg class="absolute left-0 top-0 w-full h-full"/>
