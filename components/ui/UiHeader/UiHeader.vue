@@ -2,22 +2,18 @@
   <ui-desktop-header
     v-if="isDesktop"
     :links="desktopMenu"
+    :logo-link="logoLink"
   >
     <template #action>
       <slot name="action" />
     </template>
-    <template #desktop-logo>
-      <slot name="desktop-logo" />
-    </template>
-    <template #laptop-logo>
-      <slot name="laptop-logo" />
-    </template>
   </ui-desktop-header>
 
-  <ui-mobile-header v-else>
-    <template #mobile-logo>
-      <slot name="mobile-logo" />
-    </template>
+  <ui-mobile-header
+    v-else
+    :links="mobileMenu"
+    :logo-link="logoLink"
+  >
     <template #mobile-action>
       <slot name="mobile-action" />
     </template>
@@ -25,6 +21,7 @@
 </template>
 
 <script lang="ts">
+  import type { RouteLocationRaw } from 'vue-router'
   import type { UiLinkProps } from '../UiLink.vue'
   import { defineAsyncComponent, defineComponent, PropType, watch } from 'vue'
   import { useBreakpoints } from '@vueuse/core'
@@ -33,11 +30,19 @@
 
   export default defineComponent({
     props: {
+      logoLink: {
+        type: [String, Object] as PropType<RouteLocationRaw>,
+      },
       desktopMenu: {
-        type: Array as PropType<UiLinkProps[]>
+        type: Array as PropType<UiLinkProps[]>,
+        required: true,
+      },
+      mobileMenu: {
+        type: Array as PropType<UiLinkProps[]>,
+        required: true,
       }
     },
-    setup(props) {
+    setup() {
       const { isDesktop } = useBreakpoints({ isDesktop: 750 })
       const { setHeaderType } = useHeader()
 

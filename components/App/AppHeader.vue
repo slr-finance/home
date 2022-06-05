@@ -1,6 +1,7 @@
 <template>
   <ui-header
     :desktop-menu="links"
+    :mobile-menu="links"
   >
     <template #action>
       <ui-button
@@ -11,15 +12,7 @@
         Launch App
       </ui-button>
     </template>
-    <template #desktop-logo>
-      desktop-logo
-    </template>
-    <template #laptop-logo>
-      laptop-logo
-    </template>
-    <template #mobile-logo>
-      mobile-logo
-    </template>
+    
     <template #mobile-action>
       <ui-button
         variant="white"

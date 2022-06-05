@@ -4,7 +4,10 @@
   </client-only>
 
   <div class="relative pt-ui-page-header-spacing pb-80">
-    <home-bg class="absolute left-0 top-0 w-full h-full"/>
+    <client-only>
+      <home-bg class="absolute left-0 top-0 w-full h-full"/>
+    </client-only>
+
     <div class="pl-ui-page-spacing">
       <div
         class="relative z-1"
@@ -53,6 +56,8 @@
 </template>
 
 <script lang="ts">
+import 'virtual:svg-icons-register'
+
 import { defineComponent } from 'vue'
 import './index.postcss'
 import './components/ui/index.postcss'
