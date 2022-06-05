@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, Ref } from 'vue'
-import { useResizeObserver, useRafFn, templateRef, useIntersectionObserver } from '@vueuse/core'
+import { useResizeObserver, useRafFn, templateRef, useIntersectionObserver, useEventListener } from '@vueuse/core'
 
 const gridColor = '#1B1B1B'
 const rayColor = '#2B2B2B'
@@ -172,7 +172,7 @@ export default defineComponent({
     )
 
     if (typeof window !== undefined) {
-      window.addEventListener('scroll', (e) => {
+      useEventListener('scroll', () => {
         fovY = 40 * (1 - Math.min(1, window.scrollY / (height / 1.5)))
       })
     }
