@@ -8,16 +8,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import UiButton from '../components/ui/UiButton.vue'
-import UiPoligon from '../components/ui/UiPoligon.vue'
-
-export default defineComponent({
-  layout: 'default',
-  components: {
-    UiButton,
-    UiPoligon,
-  }
+<script lang="ts" setup>
+definePageMeta({
+  title: 'DEFI 3.0 Yield Farming'
 })
 </script>
