@@ -10,7 +10,7 @@
       <div class="h-80 bg-gray-800 rounded-12">3</div>
     </div>
     <client-only>
-      <landing-svg-road
+      <lazy-home-milky-way-scheme-path
         class="absolute inset-0 w-full h-full"
         :stroke-width="10"
       />
@@ -21,11 +21,9 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { templateRef, useIntersectionObserver } from '@vueuse/core'
-import LandingSvgRoad from './LandingSvgRoad.vue'
 
 export default defineComponent({
-  components: { LandingSvgRoad },
-  name: 'landing-scheme',
+  name: 'milky-way-scheme',
   setup() {
     const target = templateRef('root')
     const targetIsVisible = ref(false)

@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { templateRef, useResizeObserver } from '@vueuse/core'
+import { templateRef, useIntersectionObserver, useResizeObserver } from '@vueuse/core'
 import { defineComponent, ref, Ref, watch } from 'vue'
 
 class SvgPath {
@@ -113,7 +113,7 @@ class SvgPath {
 }
 
 export default defineComponent({
-  name: 'landing-svg-road',
+  name: 'milky-way-scheme-path',
   props: {
     strokeWidth: {
       type: Number,
@@ -132,6 +132,16 @@ export default defineComponent({
         height: entry.contentRect.height,
       }
     })
+
+    useIntersectionObserver(
+      rootRef,
+      ([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          rootRef.value.classList.add('-shown')
+        }
+      },
+      { threshold: 0.4 }
+    )
 
     watch(
       [svgSize, () => props.strokeWidth],
@@ -197,6 +207,9 @@ export default defineComponent({
 <style scoped>
 path {
   @apply stroke-gray-800;
+}
+
+.-shown path {
   animation: dash 2s linear forwards;
 }
 

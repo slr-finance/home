@@ -111,6 +111,7 @@ const drawVignette = (ctx:CanvasRenderingContext2D, width: number, height: numbe
 }
 
 export default defineComponent({
+  name: 'landing-grid-bg',
   setup() {
     const canvasRef = templateRef('canvas') as Readonly<Ref<null|HTMLCanvasElement>>
     let width = 0

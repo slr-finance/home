@@ -11,13 +11,9 @@
 </template>
 
 <script lang="ts">
-import 'virtual:svg-icons-register'
-
 import { defineComponent } from 'vue'
-import './index.postcss'
-import './components/ui/index.postcss'
-import UiButton from './components/ui/UiButton.vue'
-import UiPoligon from './components/ui/UiPoligon.vue'
+import UiButton from '../components/ui/UiButton.vue'
+import UiPoligon from '../components/ui/UiPoligon.vue'
 
 export default defineComponent({
   layout: 'default',
