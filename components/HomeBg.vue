@@ -1,12 +1,11 @@
 <template>
-  <canvas ref="canvasRef" class="bg-black"/>
+  <canvas ref="canvas" class="bg-black"/>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
-import { useResizeObserver, useRafFn } from '@vueuse/core'
+import { defineComponent, onMounted, Ref } from 'vue'
+import { useResizeObserver, useRafFn, templateRef, useIntersectionObserver } from '@vueuse/core'
 
-const fovY = 40
 const gridColor = '#1B1B1B'
 const rayColor = '#2B2B2B'
 const mainBgColor = 'black'
@@ -20,7 +19,7 @@ if (typeof window !== 'undefined') {
 
 const interpolate = (a:number, b:number, d: number) => a * (1 - d) + b * d
 
-const drawStaticLayer = (ctx:CanvasRenderingContext2D, width: number, height: number, centerX:number, fovX:number, perspectiveRate: number) => {
+const drawStaticLayer = (ctx:CanvasRenderingContext2D, width: number, height: number, centerX:number, fovX:number, fovY: number, perspectiveRate: number) => {
   const rate = height / width
 
   const bgGradient = ctx.createRadialGradient(centerX, 0, centerX, centerX, 0, width);
@@ -113,7 +112,7 @@ const drawVignette = (ctx:CanvasRenderingContext2D, width: number, height: numbe
 
 export default defineComponent({
   setup() {
-    const canvasRef = ref(null as null|HTMLCanvasElement)
+    const canvasRef = templateRef('canvas') as Readonly<Ref<null|HTMLCanvasElement>>
     let width = 0
     let height = 0
     let ctx:null|CanvasRenderingContext2D = null
@@ -121,6 +120,7 @@ export default defineComponent({
     let cols = 0
     let perspectiveRate = 4
     let fovX = 265
+    let fovY = 40
     let centerX = Math.ceil(width / 2)
 
     useResizeObserver(canvasRef, ([entry]) => {
@@ -137,25 +137,44 @@ export default defineComponent({
       canvasEl.height = height
     })
 
-    useRafFn(() => {
+    const pausable = useRafFn(() => {
       if (!canvasEl || !ctx) {
         return
       }
+      const time = Date.now()
+      const nfovX = fovX + 20 * Math.sin(time / 15000)
 
       ctx.clearRect(0, 0, width, height)
-      drawStaticLayer(ctx, width, height, centerX, fovX, perspectiveRate)
-      const time = Date.now()
+      drawStaticLayer(ctx, width, height, centerX, nfovX, fovY, perspectiveRate)
       // первые n и последние n колонок можно пропустить, т.к. они за пределами видимости из-за затемнения
       const skipCol = 3
       const startCol = skipCol 
       const endCol = cols - skipCol
 
       for (let index = startCol; index < endCol; index++) {
-        drawRay(ctx, width, height, fovX, perspectiveRate, 8000 * index, index, time)
+        drawRay(ctx, width, height, nfovX, perspectiveRate, 8000 * index, index, time)
       }
 
       drawVignette(ctx, width, height, centerX)
     })
+
+    useIntersectionObserver(
+      canvasRef, 
+      ([{ isIntersecting }]) => {
+        if (isIntersecting) {
+          pausable.resume()
+        } else {
+          pausable.pause()
+        }
+      },
+      { threshold: 0.15 }
+    )
+
+    if (typeof window !== undefined) {
+      window.addEventListener('scroll', (e) => {
+        fovY = 40 * (1 - Math.min(1, (window.scrollY) / height))
+      })
+    }
 
     onMounted(() => {
       canvasEl = canvasRef.value
@@ -166,8 +185,6 @@ export default defineComponent({
 
       ctx = canvasEl.getContext('2d', { alpha: false })
     })
-
-    return { canvasRef }
   },
 })
 </script>
