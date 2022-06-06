@@ -9,8 +9,8 @@
         class="relative z-1 mt-48"
         style="max-width: 700px"
       >
-        <h1 class="text-60 text-gray font-title leading-140 uppercase mb-24 inline-block relative selection:bg-green-atomic selection:bg-opacity-50 selection:text-white">
-          DeFi 3.0 planets system with 
+        <app-landing-title>
+           DeFi 3.0 planets system with 
           <span class="text-white">invest & burning</span>
           <ui-poligon
             animated
@@ -20,11 +20,11 @@
           >
             Presale
           </ui-poligon>
-        </h1>
-  
-        <p class="text-gray text-20 mb-36 selection:bg-green-atomic selection:text-black">
-          Revolutionary financial protocol operating in BSC with Auto-Compounding, Auto-Liquidity mechanisms, Auto-Investing and limitless buyback.
-        </p>
+
+          <template #description>
+            Revolutionary financial protocol operating in BSC with Auto-Compounding, Auto-Liquidity mechanisms, Auto-Investing and limitless buyback.
+          </template>
+        </app-landing-title>
   
         <div class="inline-grid grid-cols-2 gap-12">
           <ui-button

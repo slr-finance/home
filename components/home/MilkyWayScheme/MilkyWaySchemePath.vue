@@ -1,5 +1,8 @@
 <template>
-  <div ref="root">
+  <div
+    ref="root"
+    :class="classList"
+  >
     <svg
       ref="svg"
       class="w-full h-full"
@@ -24,6 +27,7 @@ class SvgPath {
   private path:string = ''
   private lastX:number
   private lastY:number
+  private savedCursor = { x: 0, y: 0 }
   private offset = { l: 0, t: 0 }
 
   constructor(x:number = 0, y:number = 0) {
@@ -95,6 +99,21 @@ class SvgPath {
     return this
   }
 
+  public saveCursor() {
+    this.savedCursor = {
+      x: this.lastX,
+      y: this.lastY,
+    }
+
+    return this
+  }
+
+  public restoreCursor() {
+    this.moveTo('M', this.savedCursor.x, this.savedCursor.y)
+
+    return this
+  }
+
   public toString() { return this.path }
 
   private moveTo(modifier: 'M'|'L'|'Q', ...points:number[]) {
@@ -118,6 +137,13 @@ export default defineComponent({
     strokeWidth: {
       type: Number,
       default: 1,
+    },
+    elementsPositions: {
+      type: Object,
+      required: true,
+    },
+    show: {
+      type: Boolean,
     }
   },
   setup(props) {
@@ -125,6 +151,7 @@ export default defineComponent({
     const svgRef = templateRef('svg') as Readonly<Ref<SVGElement>>
     const rootRef = templateRef('root')
     const svgSize = ref({ width: 0, height: 0 })
+    const classList = computed(() => ({ '-shown': props.show }))
   
     useResizeObserver(rootRef, ([entry]) => {
       svgSize.value = {
@@ -133,19 +160,9 @@ export default defineComponent({
       }
     })
 
-    useIntersectionObserver(
-      rootRef,
-      ([{ isIntersecting }]) => {
-        if (isIntersecting) {
-          rootRef.value.classList.add('-shown')
-        }
-      },
-      { threshold: 0.4 }
-    )
-
     watch(
-      [svgSize, () => props.strokeWidth],
-      ([{ width, height }, strokeWidth], oldVal, onCleanup) => {
+      [svgSize, () => props.strokeWidth, () => props.elementsPositions],
+      ([{ width, height }, strokeWidth, elementsPositions], oldVal, onCleanup) => {
         const [{ value: pathEl }, { value: svgEl }] = [pathRef, svgRef]
 
         if (!pathEl || !svgEl) {
@@ -153,40 +170,64 @@ export default defineComponent({
         }
 
         // [BEGIN] Build path
-        const svgSizeVal = svgSize.value
-        const treeColSpace = 100
-        const areaWidth = svgSizeVal.width - strokeWidth / 2
-        const angleSize = 50
-        const topOffset = 80
-        const treeCollWidth = width / 3
-        const treeCollCenter = treeCollWidth / 2
+        const feesWrapper = {
+          left: elementsPositions.feesWrapper.x,
+          bottom: elementsPositions.feesWrapper.y + elementsPositions.feesWrapper.h,
+          rowHeight: elementsPositions.feesWrapper.h / 3,
+          rowCenterY: elementsPositions.feesWrapper.h / 6,
+        }
+        const milkyWay = {
+          x: elementsPositions.milkyWay.x + elementsPositions.milkyWay.w / 2,
+          y: elementsPositions.milkyWay.y + elementsPositions.milkyWay.h / 2,
+          left: elementsPositions.milkyWay.x,
+          right: elementsPositions.milkyWay.x + elementsPositions.milkyWay.w,
+        }
 
-        const firstBlocksSpace = 800
+        const invest = {
+          top: elementsPositions.invest.y,
+          bottom: elementsPositions.invest.y + elementsPositions.invest.h,
+        }
+
+        const buyBack = {
+          top: elementsPositions.buyBack.y,
+          y: elementsPositions.buyBack.y + elementsPositions.buyBack.h / 2,
+        }
+
+        const feesItemsY = elementsPositions.feesItems.map(({y, h}) => y + h / 2)
+
+
+        const angleSize = 24
 
         const d = new SvgPath()
-          .setOffset(treeCollCenter, topOffset)
+          // Fees
+          .m(milkyWay.x, milkyWay.y)
+          .l(milkyWay.right - angleSize, milkyWay.y)
+          .q(1, milkyWay.right, milkyWay.y - angleSize)
+          .saveCursor()
+          .l(milkyWay.right, feesItemsY[2] + angleSize)
+          .q(2, milkyWay.right + angleSize, feesItemsY[2])
+          .l(feesWrapper.left, feesItemsY[2])
+          .restoreCursor()
+          .l(milkyWay.right, feesItemsY[1] + angleSize)
+          .q(2, milkyWay.right + angleSize, feesItemsY[1])
+          .l(feesWrapper.left, feesItemsY[1])
+          .restoreCursor()
+          .l(milkyWay.right, feesItemsY[0] + angleSize)
+          .q(2, milkyWay.right + angleSize, feesItemsY[0])
+          .l(feesWrapper.left, feesItemsY[0])
 
-          .m(0, 0)
-          .l(0, treeColSpace - angleSize)
-          .q(2, angleSize, treeColSpace)
-          .l(treeCollWidth + angleSize, treeColSpace)
-
-          .m(treeCollWidth, 0)
-          .l(treeCollWidth, treeColSpace - angleSize)
-          .q(2, treeCollWidth + angleSize, treeColSpace)
-          .l(treeCollWidth + treeCollWidth + angleSize, treeColSpace)
-
-          .m(treeCollWidth + treeCollWidth, 0)
-          .l(treeCollWidth + treeCollWidth, treeColSpace - angleSize)
-          .q(2, treeCollWidth + treeCollWidth + angleSize, treeColSpace)
-
-          .setOffset(0, topOffset)
-
-          .l(areaWidth - angleSize, treeColSpace)
-          .q(1, areaWidth, treeColSpace + angleSize)
-          .l(areaWidth, firstBlocksSpace - angleSize - angleSize)
-
-          .q(3, areaWidth - angleSize, firstBlocksSpace - angleSize)
+          // Invest
+          .m(milkyWay.x, milkyWay.y)
+          .l(50 + angleSize, milkyWay.y)
+          .q(1, 50, milkyWay.y + angleSize)
+          .l(50, invest.bottom - angleSize + 24)
+          .q(2, 50 + angleSize, invest.bottom + 24)
+          .setOffset(0, 0)
+          .l(milkyWay.x - angleSize, invest.bottom + 24)
+          .q(1, milkyWay.x, invest.bottom + angleSize + 24)
+          // BayBack
+          .m(milkyWay.x, milkyWay.y)
+          .l(milkyWay.x, buyBack.y)
         .toString()
         // [END] Build path
 
@@ -200,6 +241,8 @@ export default defineComponent({
         svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`)
       }
     )
+
+    return { classList }
   },
 })
 </script>
@@ -210,7 +253,7 @@ path {
 }
 
 .-shown path {
-  animation: dash 2s linear forwards;
+  animation: dash 7s linear forwards;
 }
 
 @keyframes dash {
