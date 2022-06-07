@@ -7,7 +7,12 @@ export default defineNuxtConfig({
   target: 'static', // default is 'server'
   generate: {
     fallback: '404.html',
-    manifest: true
+    manifest: true,
+  },
+  render: {
+    static: {
+      prefix: false
+    },
   },
   modules: ['@nuxtjs/tailwindcss'],
   vite: {

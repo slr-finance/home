@@ -40,22 +40,16 @@
       </div>
 
       <div class="row-start-5 flex items-center " ref="invest">
-        <home-milky-way-scheme-fee-item label="Invest">
+        <home-milky-way-scheme-fee-item label="Invest" class="my-24">
           Quickly enable full user lifecycle management by syncing your app
         </home-milky-way-scheme-fee-item>
       </div>
 
-      <div
-        class="row-span-3 flex justify-center items-center bg-violet bg-opacity-50 justify-self-center self-center rounded-full text-28 font-title aspect-1"
-        style="max-width:300px; width: 95%"
-        ref="milkyWay"
-      >
-        Milkyway protocol
-      </div>
+      <home-milky-way-scheme-planet ref="milkyWay"/>
 
       <div
         ref="buyBack"
-        class="col-start-2 row-span-2 pt-80"
+        class="col-start-2 row-span-2 pt-64"
       >
         <home-milky-way-scheme-fee-item
           accent
@@ -72,13 +66,9 @@
 import { defineComponent, Ref, ref } from 'vue'
 import { templateRef, useIntersectionObserver, useResizeObserver } from '@vueuse/core'
 import  MilkyWaySchemeFeeItem from './MilkyWaySchemeFeeItem.vue'
+import  MilkyWaySchemePlanet from './MilkyWaySchemePlanet.vue'
 
-const defaultElPosition = {
-  x: 0,
-  y: 0,
-  w: 0,
-  h: 0,
-}
+const defaultElPosition = { x: 0, y: 0, w: 0, h: 0 }
 
 const getElPosition = (rootX: number, rootY: number, el: HTMLElement|SVGElement) => {
   const elDOMRect = el.getBoundingClientRect()
@@ -97,13 +87,13 @@ export default defineComponent({
     const isIntersecting = ref(false)
     const rootRef = templateRef('root')
     const feesWrapperRef = templateRef('feesWrapper')
-    const milkyWayRef = templateRef('milkyWay')
+    const milkyWayRef = templateRef('milkyWay') as any as Readonly<Ref<typeof MilkyWaySchemePlanet>>
     const investRef = templateRef('invest')
     const buyBacktRef = templateRef('buyBack')
     const feesItemRefs = [
-      templateRef('feesItem0') as Readonly<Ref<MilkyWaySchemeFeeItem>>,
-      templateRef('feesItem1') as Readonly<Ref<MilkyWaySchemeFeeItem>>,
-      templateRef('feesItem2') as Readonly<Ref<MilkyWaySchemeFeeItem>>
+      templateRef('feesItem0') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>,
+      templateRef('feesItem1') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>,
+      templateRef('feesItem2') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>
     ]
 
     const elementsPositions = ref({
@@ -119,7 +109,7 @@ export default defineComponent({
 
       elementsPositions.value = {
         feesWrapper: getElPosition(rootX, rootY, feesWrapperRef.value),
-        milkyWay: getElPosition(rootX, rootY, milkyWayRef.value),
+        milkyWay: getElPosition(rootX, rootY, milkyWayRef.value.$el),
         invest: getElPosition(rootX, rootY, investRef.value),
         buyBack: getElPosition(rootX, rootY, buyBacktRef.value),
         feesItems: feesItemRefs.map((component) => getElPosition(rootX, rootY, component.value.$el))
@@ -131,7 +121,7 @@ export default defineComponent({
     })
 
     useIntersectionObserver(
-      milkyWayRef,
+      computed(() => milkyWayRef.value?.$el),
       ([entry]) => { 
         if (entry.isIntersecting) {
           isIntersecting.value = true

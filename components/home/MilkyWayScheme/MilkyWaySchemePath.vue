@@ -14,13 +14,15 @@
         fill="none"
         :stroke-width="`${strokeWidth}px`"
         stroke-linecap="round"
+        color-rendering="optimizeSpeed"
+        shape-rendering="optimizeSpeed"
       />
     </svg>
   </div>
 </template>
 
 <script lang="ts">
-import { templateRef, useIntersectionObserver, useResizeObserver } from '@vueuse/core'
+import { templateRef, useResizeObserver } from '@vueuse/core'
 import { defineComponent, ref, Ref, watch } from 'vue'
 
 class SvgPath {
@@ -170,18 +172,16 @@ export default defineComponent({
         }
 
         // [BEGIN] Build path
-        const feesWrapper = {
-          left: elementsPositions.feesWrapper.x,
-          bottom: elementsPositions.feesWrapper.y + elementsPositions.feesWrapper.h,
-          rowHeight: elementsPositions.feesWrapper.h / 3,
-          rowCenterY: elementsPositions.feesWrapper.h / 6,
-        }
         const milkyWay = {
           x: elementsPositions.milkyWay.x + elementsPositions.milkyWay.w / 2,
           y: elementsPositions.milkyWay.y + elementsPositions.milkyWay.h / 2,
           left: elementsPositions.milkyWay.x,
           right: elementsPositions.milkyWay.x + elementsPositions.milkyWay.w,
         }
+
+        const feesWrapperLeft = elementsPositions.feesWrapper.x
+        const halfColSpace = (feesWrapperLeft - milkyWay.right) / 2
+        const vertFeeRay = milkyWay.right + halfColSpace
 
         const invest = {
           top: elementsPositions.invest.y,
@@ -195,36 +195,38 @@ export default defineComponent({
 
         const feesItemsY = elementsPositions.feesItems.map(({y, h}) => y + h / 2)
 
-
         const angleSize = 24
 
         const d = new SvgPath()
           // Fees
           .m(milkyWay.x, milkyWay.y)
-          .l(milkyWay.right - angleSize, milkyWay.y)
-          .q(1, milkyWay.right, milkyWay.y - angleSize)
           .saveCursor()
-          .l(milkyWay.right, feesItemsY[2] + angleSize)
-          .q(2, milkyWay.right + angleSize, feesItemsY[2])
-          .l(feesWrapper.left, feesItemsY[2])
+          .l(vertFeeRay - angleSize, milkyWay.y)
+          .q(1, vertFeeRay, milkyWay.y - angleSize)
+          .l(vertFeeRay, feesItemsY[2] + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsY[2])
+          .l(feesWrapperLeft, feesItemsY[2])
           .restoreCursor()
-          .l(milkyWay.right, feesItemsY[1] + angleSize)
-          .q(2, milkyWay.right + angleSize, feesItemsY[1])
-          .l(feesWrapper.left, feesItemsY[1])
+          .l(vertFeeRay - angleSize, milkyWay.y)
+          .q(1, vertFeeRay, milkyWay.y - angleSize)
+          .l(vertFeeRay, feesItemsY[1] + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsY[1])
+          .l(feesWrapperLeft, feesItemsY[1])
           .restoreCursor()
-          .l(milkyWay.right, feesItemsY[0] + angleSize)
-          .q(2, milkyWay.right + angleSize, feesItemsY[0])
-          .l(feesWrapper.left, feesItemsY[0])
+          .l(vertFeeRay - angleSize, milkyWay.y)
+          .q(1, vertFeeRay, milkyWay.y - angleSize)
+          .l(vertFeeRay, feesItemsY[0] + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsY[0])
+          .l(feesWrapperLeft, feesItemsY[0])
 
           // Invest
           .m(milkyWay.x, milkyWay.y)
           .l(50 + angleSize, milkyWay.y)
           .q(1, 50, milkyWay.y + angleSize)
-          .l(50, invest.bottom - angleSize + 24)
-          .q(2, 50 + angleSize, invest.bottom + 24)
-          .setOffset(0, 0)
-          .l(milkyWay.x - angleSize, invest.bottom + 24)
-          .q(1, milkyWay.x, invest.bottom + angleSize + 24)
+          .l(50, invest.bottom - angleSize)
+          .q(2, 50 + angleSize, invest.bottom)
+          .l(milkyWay.x - angleSize, invest.bottom)
+          .q(1, milkyWay.x, invest.bottom + angleSize)
           // BayBack
           .m(milkyWay.x, milkyWay.y)
           .l(milkyWay.x, buyBack.y)
@@ -247,7 +249,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 path {
   @apply stroke-gray-800;
 }

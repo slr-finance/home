@@ -8,8 +8,8 @@
     </div>
 
     <div>
-      <h4 class="text-white text-ui-page-label mb-8">{{ label }}</h4>
-      <p class="text-gray text-ui-page-description leading-140"><slot/></p>
+      <h4 class="text-white text-ui-page-label mb-8 selection:bg-green-atomic selection:bg-opacity-50 selection:text-white">{{ label }}</h4>
+      <p class="text-gray text-ui-page-description leading-140 selection:bg-green-atomic selection:text-black"><slot/></p>
     </div>
   </div>
 </template>
