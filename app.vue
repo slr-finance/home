@@ -8,8 +8,13 @@
 import 'virtual:svg-icons-register'
 import './index.postcss'
 import './components/ui/index.postcss'
+import { initReferral } from './libs/referral'
 
 const route = useRoute()
+
+if (typeof window !== 'undefined') {
+  initReferral()
+}
 
 useHead({
   title: '',
