@@ -1,6 +1,7 @@
 <template>
   <div
     ref="root"
+    class="home-milky-way-scheme-path"
     :class="classList"
   >
     <svg
@@ -12,6 +13,7 @@
       <path
         ref="path"
         fill="none"
+        class="stroke-gray-800"
         :stroke-width="`${strokeWidth}px`"
         stroke-linecap="round"
         color-rendering="optimizeSpeed"
@@ -134,7 +136,7 @@ class SvgPath {
 }
 
 export default defineComponent({
-  name: 'milky-way-scheme-path',
+  name: 'home-milky-way-scheme-path',
   props: {
     strokeWidth: {
       type: Number,
@@ -193,7 +195,11 @@ export default defineComponent({
           y: elementsPositions.buyBack.y + elementsPositions.buyBack.h / 2,
         }
 
-        const feesItemsY = elementsPositions.feesItems.map(({y, h}) => y + h / 2)
+        const feesItemsCenter = elementsPositions.feesItems.map(({y, h, x, w}) => ({
+          y: y + h / 2,
+          x: x + w / 2,
+        }))
+        const investIconWrapX = elementsPositions.investIconWrap.x + elementsPositions.investIconWrap.w / 2
 
         const angleSize = 24
 
@@ -203,28 +209,28 @@ export default defineComponent({
           .saveCursor()
           .l(vertFeeRay - angleSize, milkyWay.y)
           .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsY[2] + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsY[2])
-          .l(feesWrapperLeft, feesItemsY[2])
+          .l(vertFeeRay, feesItemsCenter[2].y + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsCenter[2].y)
+          .l(feesItemsCenter[2].x, feesItemsCenter[2].y)
           .restoreCursor()
           .l(vertFeeRay - angleSize, milkyWay.y)
           .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsY[1] + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsY[1])
-          .l(feesWrapperLeft, feesItemsY[1])
+          .l(vertFeeRay, feesItemsCenter[1].y + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsCenter[1].y)
+          .l(feesItemsCenter[1].x, feesItemsCenter[1].y)
           .restoreCursor()
           .l(vertFeeRay - angleSize, milkyWay.y)
           .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsY[0] + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsY[0])
-          .l(feesWrapperLeft, feesItemsY[0])
+          .l(vertFeeRay, feesItemsCenter[0].y + angleSize)
+          .q(2, vertFeeRay + angleSize, feesItemsCenter[0].y)
+          .l(feesItemsCenter[0].x, feesItemsCenter[0].y)
 
           // Invest
           .m(milkyWay.x, milkyWay.y)
-          .l(50 + angleSize, milkyWay.y)
-          .q(1, 50, milkyWay.y + angleSize)
-          .l(50, invest.bottom - angleSize)
-          .q(2, 50 + angleSize, invest.bottom)
+          .l(investIconWrapX + angleSize, milkyWay.y)
+          .q(1, investIconWrapX, milkyWay.y + angleSize)
+          .l(investIconWrapX, invest.bottom - angleSize)
+          .q(2, investIconWrapX + angleSize, invest.bottom)
           .l(milkyWay.x - angleSize, invest.bottom)
           .q(1, milkyWay.x, invest.bottom + angleSize)
           // BayBack
@@ -250,15 +256,15 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-path {
-  @apply stroke-gray-800;
+.home-milky-way-scheme-path {
+  content-visibility: auto;
 }
 
-.-shown path {
-  animation: dash 7s linear forwards;
+.home-milky-way-scheme-path.-shown path {
+  animation: home-milky-way-scheme-path-dash 7s linear forwards;
 }
 
-@keyframes dash {
+@keyframes home-milky-way-scheme-path-dash {
   to {
     stroke-dashoffset: 0;
   }

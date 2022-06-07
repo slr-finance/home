@@ -25,23 +25,43 @@
       </app-landing-title>
 
       <div
-        class="row-span-3 flex flex-col space-y-12 justify-between items-stretch"
+        class="row-span-3 flex flex-col space-y-24 justify-between items-stretch"
         ref="feesWrapper"
       >
-        <home-milky-way-scheme-fee-item ref="feesItem0" label="Swap fees">
-          Quickly enable full user lifecycle management by syncing your app
+        <home-milky-way-scheme-fee-item
+          ref="feesItem0"
+          label="Swap fees"
+          icon-name="home-milkyway-staking"
+          :column="isSmall"
+        >
+          Quickly enable full user lifecycle management by syncing your app 1
         </home-milky-way-scheme-fee-item>
-        <home-milky-way-scheme-fee-item ref="feesItem1" label="Staking withdrawal fees">
-          Quickly enable full user lifecycle management by syncing your app
+        <home-milky-way-scheme-fee-item
+          ref="feesItem1"
+          label="Staking withdrawal fees"
+          icon-name="home-milkyway-swap"
+          :column="isSmall"
+        >
+          Quickly enable full user lifecycle management by syncing your app 2
         </home-milky-way-scheme-fee-item>
-        <home-milky-way-scheme-fee-item ref="feesItem2" label="Transfer fees">
-          Quickly enable full user lifecycle management by syncing your app
+        <home-milky-way-scheme-fee-item
+          ref="feesItem2"
+          label="Transfer fees"
+          icon-name="home-milkyway-swap"
+          :column="isSmall"
+        >
+          Quickly enable full user lifecycle management by syncing your app 3
         </home-milky-way-scheme-fee-item>
       </div>
 
-      <div class="row-start-5 flex items-center " ref="invest">
-        <home-milky-way-scheme-fee-item label="Invest" class="my-24">
-          Quickly enable full user lifecycle management by syncing your app
+      <div class="row-start-5 flex items-center" ref="invest">
+        <home-milky-way-scheme-fee-item
+          ref="investComponent"
+          label="Invest"
+          icon-name="home-milkyway-swap"
+          bage="Auto"
+        >
+          Quickly enable full user lifecycle management by syncing your app 4
         </home-milky-way-scheme-fee-item>
       </div>
 
@@ -49,13 +69,15 @@
 
       <div
         ref="buyBack"
-        class="col-start-2 row-span-2 pt-64"
+        class="col-span-3 row-span-2 pt-64 justify-self-center"
       >
         <home-milky-way-scheme-fee-item
           accent
+          column
           label="Buy back and burn liquidity"
+          icon-name="home-milkyway-swap"
         >
-          Quickly enable full user lifecycle management by syncing your app
+          Quickly enable full user lifecycle management by syncing your app 5
         </home-milky-way-scheme-fee-item>
       </div>
     </div>
@@ -82,13 +104,15 @@ const getElPosition = (rootX: number, rootY: number, el: HTMLElement|SVGElement)
 } 
 
 export default defineComponent({
-  name: 'milky-way-scheme',
+  name: 'home-milky-way-scheme',
   setup() {
     const isIntersecting = ref(false)
+    const isSmall = ref(true)
     const rootRef = templateRef('root')
     const feesWrapperRef = templateRef('feesWrapper')
     const milkyWayRef = templateRef('milkyWay') as any as Readonly<Ref<typeof MilkyWaySchemePlanet>>
     const investRef = templateRef('invest')
+    const investComponentRef = templateRef('investComponent') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>
     const buyBacktRef = templateRef('buyBack')
     const feesItemRefs = [
       templateRef('feesItem0') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>,
@@ -100,6 +124,7 @@ export default defineComponent({
       feesWrapper: defaultElPosition,
       milkyWay: defaultElPosition,
       invest: defaultElPosition,
+      investIconWrap: defaultElPosition,
       buyBack: defaultElPosition,
       feesItems: [defaultElPosition, defaultElPosition, defaultElPosition]
     })
@@ -111,12 +136,15 @@ export default defineComponent({
         feesWrapper: getElPosition(rootX, rootY, feesWrapperRef.value),
         milkyWay: getElPosition(rootX, rootY, milkyWayRef.value.$el),
         invest: getElPosition(rootX, rootY, investRef.value),
+        investIconWrap: getElPosition(rootX, rootY, investComponentRef.value.iconWrapperRef),
         buyBack: getElPosition(rootX, rootY, buyBacktRef.value),
-        feesItems: feesItemRefs.map((component) => getElPosition(rootX, rootY, component.value.$el))
+        feesItems: feesItemRefs.map((component) => getElPosition(rootX, rootY, component.value.iconWrapperRef))
       }
     }
 
-    useResizeObserver(rootRef, () => {
+    useResizeObserver(rootRef, ([{ contentRect: { width }}]) => {
+      isSmall.value = width < 900
+
       updatePositions()
     })
 
@@ -130,7 +158,7 @@ export default defineComponent({
       { threshold: 1 },
     )
 
-    return { elementsPositions, isIntersecting }
+    return { elementsPositions, isIntersecting, isSmall }
   },
 })
 </script>

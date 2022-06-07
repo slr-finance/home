@@ -1,7 +1,7 @@
 <template>
   <div
     class="row-span-3 relative flex justify-center items-center justify-self-center self-center aspect-1 selection:bg-green-atomic selection:text-black"
-    style="max-width:340px; width: 95%"
+    style="max-width:340px; width: 95%; content-visibility: auto;"
     ref="milkyWay"
   >
 

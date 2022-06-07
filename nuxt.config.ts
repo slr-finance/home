@@ -21,6 +21,7 @@ export default defineNuxtConfig({
         // Specify the icon folder to be cached
         iconDirs: [
           path.resolve(process.cwd(), 'components/ui/UiIcon/icons'),
+          path.resolve(process.cwd(), 'icons'),
         ],
         inject: 'body-last',
         symbolId: 'ui-icon-[dir]-[name]',

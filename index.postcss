@@ -10,8 +10,10 @@
   text-rendering: optimizeSpeed;
 
   --ui-page-title-size: 38px;
+  --ui-page-title-large-size: 60px;
   --ui-page-description-size: 16px;
   --ui-page-label-size: 18px;
+  --ui-page-label-large-size: 20px;
   --ui-page-spacing: calc((100% - 1340px) / 2);
   --ui-page-inner-spacing: 24px;
   --ui-page-right-spacing-with-right-buttons: calc(var(--ui-page-spacing) * 2 + 50px)
@@ -26,6 +28,8 @@
 @media only screen and (max-width: 1200px) {
   body {
     --ui-page-spacing: 24px;
+    --ui-page-title-large-size: 52px;
+    --ui-page-label-large-size: 18px;
   }
 }
 
@@ -34,9 +38,16 @@
     --ui-page-spacing: 18px;
     --ui-page-inner-spacing: 18px;
     --ui-page-title-size: 32px;
+    --ui-page-title-large-size: 48px;
     --ui-page-description-size: 15px;
-    --ui-page-label-size: 17px;
     --ui-page-label-size: 16px;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  body {
+    --ui-page-title-large-size: 38px;
+    --ui-page-label-large-size: 16px;
   }
 }
 
@@ -45,6 +56,7 @@
     --ui-page-spacing: 12px;
     --ui-page-inner-spacing: 12px;
     --ui-page-title-size: 28px;
+    --ui-page-title-large-size: 32px;
     --ui-page-description-size: 14px;
     --ui-page-label-size: 15px;
   }

@@ -49,8 +49,10 @@ module.exports = {
       40: '40px',
       60: '60px',
       'ui-page-title': 'var(--ui-page-title-size)',
+      'ui-page-large-title': 'var(--ui-page-title-large-size)',
       'ui-page-description': 'var(--ui-page-description-size)',
       'ui-page-label': 'var(--ui-page-label-size)',
+      'ui-page-large-label': 'var(--ui-page-label-large-size)',
     },
     lineHeight: {
       none: 1,
