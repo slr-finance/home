@@ -1,8 +1,10 @@
 <template>
   <svg
-    aria-hidden="true"
     :width="size"
     :height="size"
+    aria-hidden="true"
+    color-rendering="optimizeSpeed"
+    shape-rendering="optimizeSpeed"
   >
     <use
       :xlink:href="symbolId"

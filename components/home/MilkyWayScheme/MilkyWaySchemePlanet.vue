@@ -1,10 +1,9 @@
 <template>
   <div
-    class="row-span-3 relative flex justify-center items-center justify-self-center self-center aspect-1 selection:bg-green-atomic selection:text-black"
+    class="row-span-3 relative flex justify-center items-center justify-self-center self-center aspect-1 selection:bg-green-atomic selection:text-black select-none"
     style="max-width:340px; width: 95%; content-visibility: auto;"
     ref="milkyWay"
   >
-
     <video
       autoplay
       loop
@@ -14,7 +13,7 @@
       class="w-full aspect-1"
       :class="{ 'opacity-0': !isShownWideo }"
       src="/home/wilkyWay/planet2x.webm"
-      @canplaythrough="handleVideoLoaded"
+      @canplay="oncanplay"
     />
 
     ​<picture v-if="!isShownWideo">
@@ -44,11 +43,11 @@ export default defineComponent({
   setup() {
     const isShownWideo = ref(false)
 
-    const handleVideoLoaded = () => {
+    const oncanplay = () => {
       isShownWideo.value = true
     }
 
-    return { isShownWideo, handleVideoLoaded }
+    return { isShownWideo, oncanplay }
   },
 })
 </script>
