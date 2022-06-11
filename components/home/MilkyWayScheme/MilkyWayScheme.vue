@@ -11,21 +11,23 @@
         :elements-positions="elementsPositions"
       />
     </client-only>
-    <div class="grid grid-cols-3 gap-y-0 gap-x-48 relative z-1" style="grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr)">
-      <app-landing-title class="col-span-2 row-span-2" style="max-width:700px;">
-        Limitless 
-        <span class="text-white">buyback</span>
-        and
-        <span class="text-white">investing</span>
-
-        <template #description>
-          Unique multi-level staking. Discover new planets and increase APY to 1,017.56%.
-          Earn with auto compounding with a large fixed APY.
-        </template>
-      </app-landing-title>
+    <div class="grid relative z-1" style="grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); flex-grow: 2">
+      <div class="relative">
+        <app-landing-title class="sticky top-ui-page-header-spacing mr-24" style="max-width:700px;">
+          Limitless 
+          <span class="text-white">buyback</span>
+          and
+          <span class="text-white">investing</span>
+  
+          <template #description>
+            Unique multi-level staking. Discover new planets and increase APY to 1,017.56%.
+            Earn with auto compounding with a large fixed APY.
+          </template>
+        </app-landing-title>
+      </div>
 
       <div
-        class="row-span-3 flex flex-col space-y-24 justify-between items-stretch"
+        class="flex-1 self-start row-span-2 flex flex-col space-y-64 justify-between items-stretch pl-24"
         ref="feesWrapper"
       >
         <home-milky-way-scheme-fee-item
@@ -54,32 +56,40 @@
         </home-milky-way-scheme-fee-item>
       </div>
 
-      <div class="row-start-5 flex items-center" ref="invest">
-        <home-milky-way-scheme-fee-item
-          ref="investComponent"
-          label="Invest"
-          icon-name="home-milkyway-swap"
-          bage="Auto"
-        >
-          Quickly enable full user lifecycle management by syncing your app 4
-        </home-milky-way-scheme-fee-item>
-      </div>
-
-      <home-milky-way-scheme-planet ref="milkyWay"/>
-
       <div
-        ref="buyBack"
-        class="col-span-3 row-span-2 pt-64 justify-self-center"
+        class="grid grid-cols-2 gap-y-0 gap-x-48 pr-24"
+        style="grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); flex-grow: 2"
       >
-        <home-milky-way-scheme-fee-item
-          accent
-          column
-          label="Buy back and burn liquidity"
-          icon-name="home-milkyway-swap"
-        >
-          Quickly enable full user lifecycle management by syncing your app 5
-        </home-milky-way-scheme-fee-item>
+        <div class="row-start-2 flex items-center" ref="invest">
+          <home-milky-way-scheme-fee-item
+            ref="investComponent"
+            label="Invest"
+            icon-name="home-milkyway-swap"
+            bage="Auto"
+            class="py-24"
+          >
+            Quickly enable full user lifecycle management by syncing your app 4
+          </home-milky-way-scheme-fee-item>
+        </div>
+
+        <home-milky-way-scheme-planet
+          class="row-span-2"
+          ref="milkyWay"
+        />
       </div>
+    </div>
+    <div
+      class="flex justify-center mt-80"
+    >
+      <home-milky-way-scheme-fee-item
+        accent
+        column
+        label="Buy back and burn liquidity"
+        icon-name="home-milkyway-swap"
+        ref="buyBack"
+      >
+        Quickly enable full user lifecycle management by syncing your app 5
+      </home-milky-way-scheme-fee-item>
     </div>
   </div>
 </template>
@@ -113,7 +123,7 @@ export default defineComponent({
     const milkyWayRef = templateRef('milkyWay') as any as Readonly<Ref<typeof MilkyWaySchemePlanet>>
     const investRef = templateRef('invest')
     const investComponentRef = templateRef('investComponent') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>
-    const buyBacktRef = templateRef('buyBack')
+    const buyBacktRef = templateRef('buyBack') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>
     const feesItemRefs = [
       templateRef('feesItem0') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>,
       templateRef('feesItem1') as any as Readonly<Ref<typeof MilkyWaySchemeFeeItem>>,
@@ -137,7 +147,7 @@ export default defineComponent({
         milkyWay: getElPosition(rootX, rootY, milkyWayRef.value.$el),
         invest: getElPosition(rootX, rootY, investRef.value),
         investIconWrap: getElPosition(rootX, rootY, investComponentRef.value.iconWrapperRef),
-        buyBack: getElPosition(rootX, rootY, buyBacktRef.value),
+        buyBack: getElPosition(rootX, rootY, buyBacktRef.value.iconWrapperRef),
         feesItems: feesItemRefs.map((component) => getElPosition(rootX, rootY, component.value.iconWrapperRef))
       }
     }

@@ -27,69 +27,52 @@
 import { templateRef, useResizeObserver } from '@vueuse/core'
 import { defineComponent, ref, Ref, watch } from 'vue'
 
+enum SvgPathPointType {
+  line,
+  move,
+}
+
+type Point = {
+  x: number,
+  y: number,
+}
+
+type Cmd = (string|number)[]
+
+class CurveCmd extends Array<string|number> {
+  origPoint: Point = { x:0, y: 0 }
+
+  constructor(...params:Cmd) {
+    super()
+
+    this.push(...params)
+  }
+}
+
 class SvgPath {
-  private path:string = ''
-  private lastX:number
-  private lastY:number
-  private savedCursor = { x: 0, y: 0 }
+  private lastCursor: [number, number] = [0, 0] // x, y
+  private savedCursor: [number, number] = [0, 0] // x, y
   private offset = { l: 0, t: 0 }
-
-  constructor(x:number = 0, y:number = 0) {
-    this.path = `M ${x} ${y}`
-  }
-  
-  /**
-   * Рисует дугу
-   * 
-   * номера углов:  
-   *   0|1
-   *   ---
-   *   2|3
-   */
-  public q(a:0|1|2|3, toX:number, toY:number) {
-    let lx:number
-    let ly:number
-    
-    switch (a) {
-      case 0: {
-        throw new Error('[SvgPath]: not implemented')
-        break  
-      }
-      case 1: {
-        lx = toX
-        ly = this.lastY
-        break
-      }
-      case 2: {
-        lx = this.lastX
-        ly = toY
-        break
-      }
-      case 3: {
-        lx = this.lastX
-        ly = toY
-        break
-      }
-      default:{
-        throw new Error('[SvgPath.q]: unknown props "a"')
-      }
-    }
-
-    return this.moveTo('Q', lx, ly, toX, toY)
-  }
+  private p: {t: SvgPathPointType, p:number[]}[] = []
 
   /**
    * Проводит линию от курсора к указанным координатам
    */
   public l(toX:number, toY:number) {
-    return this.moveTo('L', toX, toY)
+    this.lastCursor = [toX, toY]
+    this.p.push({t: SvgPathPointType.line, p: [toX, toY]})
+    
+    return this
   }
 
   /**
    * Перемещает курсор
    */
   public m(toX:number, toY:number) {
-    return this.moveTo('M', toX, toY)
+    this.lastCursor = [toX, toY]
+    this.p.push({t: SvgPathPointType.move, p: [toX, toY]})
+
+    return this
   }
 
   /**
@@ -104,34 +87,166 @@ class SvgPath {
   }
 
   public saveCursor() {
-    this.savedCursor = {
-      x: this.lastX,
-      y: this.lastY,
-    }
+    this.savedCursor = [ ...this.lastCursor ]
 
     return this
   }
 
   public restoreCursor() {
-    this.moveTo('M', this.savedCursor.x, this.savedCursor.y)
+    this.p.push({t: SvgPathPointType.move, p: this.savedCursor})
 
     return this
   }
 
-  public toString() { return this.path }
-
-  private moveTo(modifier: 'M'|'L'|'Q', ...points:number[]) {
+  private getPart(modifier: 'M'|'L'|'Q', points:number[]):Cmd {
     const length = points.length
 
     if (length % 2 !== 0 || length < 2) {
       throw new Error(`[SvgPath.moveTo]: incorrect points \n${JSON.stringify(points)}`)
     }
-    
-    this.path = `${this.path} ${modifier} ${points.map((point, index) => point + (index % 2 === 0 ? this.offset.l : this.offset.t)).join(' ')}`
-    this.lastX = points[length - 2]
-    this.lastY = points[length - 1]
 
-    return this
+    return [modifier, ...points.map((point, index) => point + (index % 2 === 0 ? this.offset.l : this.offset.t))]
+  }
+
+  public build() {
+    const pathParts = this.p.reduce((parts, point) => {
+      if (point.t === SvgPathPointType.line) {
+        parts.push(...this.getPart('L', point.p))
+      } else if (point.t === SvgPathPointType.move) {
+        parts.push(...this.getPart('M', point.p))
+      }
+
+      return parts
+    }, [] as Cmd)
+
+    const useFractionalRadius = false
+    const radius = 20
+  
+  // Group the commands with their arguments for easier handling
+    const commands = pathParts.reduce((commands, part) => {
+      if (Number(part).toString() == part && commands.length) {
+        commands[commands.length - 1].push(part)
+      } else {
+        commands.push([part])
+      }
+      
+      return commands
+    }, [])
+    
+    // The resulting commands, also grouped
+    let resultCommands: CurveCmd[] = []
+    
+    if (commands.length > 1) {
+      const startPoint = this.pointForCommand(commands[0])
+      
+      // Handle the close path case with a "virtual" closing line
+      let virtualCloseLine: null|Cmd = null;
+      if (commands[commands.length - 1][0] == 'Z' && commands[0].length > 2) {
+        virtualCloseLine = ['L', startPoint.x, startPoint.y]
+        commands[commands.length - 1] = virtualCloseLine
+      }
+      
+      // We always use the first command (but it may be mutated)
+      resultCommands.push(commands[0])
+      
+      for (let cmdIndex=1; cmdIndex < commands.length; cmdIndex++) {
+        const prevCmd = resultCommands[resultCommands.length - 1]
+        const curCmd:CurveCmd = commands[cmdIndex]
+        
+        // Handle closing case
+        const nextCmd = (curCmd == virtualCloseLine)
+          ? commands[1]
+          : commands[cmdIndex + 1]
+        
+        // Nasty logic to decide if this path is a candidite.
+        if (nextCmd && prevCmd && (prevCmd.length > 2) && curCmd[0] == 'L' && nextCmd.length > 2 && nextCmd[0] == 'L') {
+          // Calc the points we're dealing with
+          const prevPoint = this.pointForCommand(prevCmd)
+          const curPoint = this.pointForCommand(curCmd)
+          const nextPoint = this.pointForCommand(nextCmd)
+          
+          // The start and end of the cuve are just our point moved towards the previous and next points, respectivly
+          let curveStart: Point
+          let curveEnd: Point
+          
+          if (useFractionalRadius) {
+            curveStart = this.moveTowardsFractional(curPoint, prevCmd.origPoint || prevPoint, radius)
+            curveEnd = this.moveTowardsFractional(curPoint, nextCmd.origPoint || nextPoint, radius)
+          } else {
+            curveStart = this.moveTowardsLength(curPoint, prevPoint, radius)
+            curveEnd = this.moveTowardsLength(curPoint, nextPoint, radius)
+          }
+          
+          // Adjust the current command and add it
+          this.adjustCommand(curCmd, curveStart)
+          curCmd.origPoint = curPoint
+          resultCommands.push(curCmd)
+          
+          // The curve control points are halfway between the start/end of the curve and
+          // the original point
+          const startControl: Point = this.moveTowardsFractional(curveStart, curPoint, .5)
+          const endControl: Point = this.moveTowardsFractional(curPoint, curveEnd, .5)
+    
+          // Create the curve 
+          const curveCmd = new CurveCmd('C', startControl.x, startControl.y, endControl.x, endControl.y, curveEnd.x, curveEnd.y)
+          // Save the original point for fractional calculations
+          curveCmd.origPoint = curPoint
+          resultCommands.push(curveCmd)
+        } else {
+          // Pass through commands that don't qualify
+          resultCommands.push(curCmd)
+        }
+      }
+      
+      // Fix up the starting point and restore the close path if the path was orignally closed
+      if (virtualCloseLine) {
+        const newStartPoint = this.pointForCommand(resultCommands[resultCommands.length-1])
+
+        resultCommands.push(new CurveCmd('Z'))
+        this.adjustCommand(resultCommands[0], newStartPoint)
+      }
+    } else {
+      resultCommands = commands;
+    }
+    
+    return resultCommands.reduce(
+      (str, c) => `${str}${c.join(' ')} `,
+      '',
+    )
+  }
+
+
+
+  private moveTowardsLength(movingPoint: Point, targetPoint: Point, amount:number):Point {
+    const width = (targetPoint.x - movingPoint.x)
+    const height = (targetPoint.y - movingPoint.y)
+    
+    const distance = Math.sqrt(width**2 + height**2)
+    
+    return this.moveTowardsFractional(movingPoint, targetPoint, Math.min(1, amount / distance));
+  }
+  
+  private moveTowardsFractional(movingPoint: Point, targetPoint: Point, fraction: number):Point {
+    return {
+      x: movingPoint.x + (targetPoint.x - movingPoint.x)*fraction,
+      y: movingPoint.y + (targetPoint.y - movingPoint.y)*fraction
+    };
+  }
+  
+  // Adjusts the ending position of a command
+  private adjustCommand(cmd:Cmd, newPoint:Point) {
+    if (cmd.length > 2) {
+      cmd[cmd.length - 2] = newPoint.x;
+      cmd[cmd.length - 1] = newPoint.y;
+    }
+  }
+  
+  // Gives an {x, y} object for a command's ending position
+  private pointForCommand(cmd:Cmd): Point {
+    return {
+      x: Number(cmd[cmd.length - 2]),
+      y: Number(cmd[cmd.length - 1]),
+    };
   }
 }
 
@@ -201,42 +316,39 @@ export default defineComponent({
         }))
         const investIconWrapX = elementsPositions.investIconWrap.x + elementsPositions.investIconWrap.w / 2
 
-        const angleSize = 24
+        const da = (d) => {
+          return d
+            
+        }
 
-        const d = new SvgPath()
+        let d = new SvgPath()
           // Fees
           .m(milkyWay.x, milkyWay.y)
           .saveCursor()
-          .l(vertFeeRay - angleSize, milkyWay.y)
-          .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsCenter[2].y + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsCenter[2].y)
+          .l(vertFeeRay, milkyWay.y)
+          .l(vertFeeRay, feesItemsCenter[2].y)
           .l(feesItemsCenter[2].x, feesItemsCenter[2].y)
           .restoreCursor()
-          .l(vertFeeRay - angleSize, milkyWay.y)
-          .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsCenter[1].y + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsCenter[1].y)
+          .l(vertFeeRay, milkyWay.y)
+          // .l(vertFeeRay, feesItemsCenter[2].y)
+          .l(vertFeeRay, feesItemsCenter[1].y)
           .l(feesItemsCenter[1].x, feesItemsCenter[1].y)
           .restoreCursor()
-          .l(vertFeeRay - angleSize, milkyWay.y)
-          .q(1, vertFeeRay, milkyWay.y - angleSize)
-          .l(vertFeeRay, feesItemsCenter[0].y + angleSize)
-          .q(2, vertFeeRay + angleSize, feesItemsCenter[0].y)
+          .l(vertFeeRay, milkyWay.y)
+          //.l(vertFeeRay, feesItemsCenter[2].y)
+          .l(vertFeeRay, feesItemsCenter[0].y)
           .l(feesItemsCenter[0].x, feesItemsCenter[0].y)
 
           // Invest
           .m(milkyWay.x, milkyWay.y)
-          .l(investIconWrapX + angleSize, milkyWay.y)
-          .q(1, investIconWrapX, milkyWay.y + angleSize)
-          .l(investIconWrapX, invest.bottom - angleSize)
-          .q(2, investIconWrapX + angleSize, invest.bottom)
-          .l(milkyWay.x - angleSize, invest.bottom)
-          .q(1, milkyWay.x, invest.bottom + angleSize)
+          .l(investIconWrapX, milkyWay.y)
+          .l(investIconWrapX, invest.bottom)
+          .l(milkyWay.x, invest.bottom)
+          .l(milkyWay.x, buyBack.y)
           // BayBack
           .m(milkyWay.x, milkyWay.y)
           .l(milkyWay.x, buyBack.y)
-        .toString()
+        .build()
         // [END] Build path
 
         pathEl.setAttribute('d', d)
@@ -253,6 +365,7 @@ export default defineComponent({
     return { classList }
   },
 })
+
 </script>
 
 <style lang="postcss" scoped>
