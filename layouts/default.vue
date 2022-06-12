@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :style="styleList">
     <app-header />
     <slot/>
   </div>
@@ -17,4 +17,12 @@ watch(
   (isDesktopVal) => setHeaderType(isDesktopVal ? HeaderType.DEFAULT_DESKTOP : HeaderType.DEFAULT_MOBILE),
   { immediate: true },
 )
+
+const styleList = ref({ display: 'none' })
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    styleList.value = { display: 'block' }
+  }
+})
 </script>
