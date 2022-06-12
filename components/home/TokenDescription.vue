@@ -1,6 +1,5 @@
 <template>
   <div>
-    <img src="~~/images/referral-program-bg.png">
     <app-landing-title>
       SLR token 
       <span class="text-white">includes</span>

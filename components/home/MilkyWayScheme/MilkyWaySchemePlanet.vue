@@ -21,7 +21,7 @@
       <source srcset="/home/wilkyWay/planet1x.png 1x, /home/wilkyWay/planet2x.png 2x" type="image/png">
       <img
         loading="lazy"
-        decode="async"
+        decoding="async"
         src="/home/wilkyWay/planet1x.png"
         alt=""
         class="w-full aspect-1 absolute inset-0 z-1"

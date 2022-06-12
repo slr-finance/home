@@ -3,6 +3,7 @@
     <home-hero/>
 
     <div class="mx-ui-page-spacing space-y-[140px]">
+      <home-screenshot/>
       <home-token-description/>
       <home-staking-description/>
       <home-milky-way-scheme/>
