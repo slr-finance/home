@@ -16,6 +16,9 @@ if (typeof window !== 'undefined') {
   initReferral()
 }
 
+const defaultSocialMediaDescription = 'Amazing DeFi planets system'
+const defaultSocialMediaImage = 'https://slr.finance/home/screenshot/bg1x.jpg'
+
 useHead({
   title: '',
   titleTemplate: () => `${route.meta.title} | SLR.Finance`,
@@ -24,6 +27,11 @@ useHead({
   meta: [
     { name: 'description', content: 'Amazing DeFi planets system' },
     { name: 'og:title', content: `SLR.Finance - ${route.meta.title}` },
+    { name: 'twitter:title', content: `SLR.Finance - ${route.meta.title}` },
+    { name: 'og:description', content: defaultSocialMediaDescription },
+    { name: 'twitter:description', content: defaultSocialMediaDescription },
+    { name: 'og:image', content: defaultSocialMediaImage },
+    { name: 'twitter:image', content: defaultSocialMediaImage },
   ],
 })
 </script>
