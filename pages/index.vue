@@ -7,6 +7,7 @@
       <home-token-description/>
       <home-staking-description/>
       <home-milky-way-scheme/>
+      <home-roadmap-slider/>
     </div>
   </div>
 </template>
