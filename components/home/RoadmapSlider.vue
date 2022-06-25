@@ -15,33 +15,33 @@
       <button class="w-64 h-64 rounded-full flex items-center justify-center bg-gray-800 shrink-0" @click="changeScroll('left')">
         <ui-icon name="arrow-pixel-to" :size="20" class="text-white transform rotate-90"/>
       </button>
-      <div ref="wrapper" class="flex space-x-[76px] overflow-x-auto snap-x absolute left-[72px] right-[72px] items-center h-[218px]">
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+      <div ref="wrapper" class="flex 420:space-x-[76px] overflow-x-auto snap-x absolute left-[72px] right-[72px] items-center h-[218px]">
+        <div class="slide">
           <ui-icon class="absolute -top-[80px]" name="flag" size="54" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
         </div>
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+        <div class="slide">
           <ui-icon class="absolute -top-[52px]" name="star-pixel" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
         </div>
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+        <div class="slide">
           <ui-icon class="absolute -top-[52px]" name="star-pixel" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
         </div>
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+        <div class="slide">
           <ui-icon class="absolute -top-[52px]" name="star-pixel" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
         </div>
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+        <div class="slide">
           <ui-icon class="absolute -top-[52px]" name="star-pixel" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
         </div>
-        <div class="flex flex-col items-center shrink-0 relative snap-start">
+        <div class="slide">
           <ui-icon class="absolute -top-[52px]" name="star-pixel" />
           <span class="text-gray text-18">Current status</span>
           <span class="text-18 text-white">Rersricted mainnet</span>
@@ -59,8 +59,11 @@ import { defineComponent, ref, onMounted } from 'vue'
 import UiIcon from '~~/components/ui/UiIcon/UiIcon.vue'
 import AppLandingTitle from '../App/AppLandingTitle.vue';
 
+type TDirection = 'right' | 'left'
+
 const ITEM_WIDTH = 162;
 const GAP = 76;
+const MOBILE_WIDTH = 420;
 
 export default defineComponent({
   name: 'home-roadmap-slider',
@@ -69,7 +72,7 @@ export default defineComponent({
     const wrapper = ref<HTMLDivElement>(null)
     let idx = 0
 
-    const changeScroll = (direction: 'right' | 'left') => {
+    const changeScrollOnDesktop = (direction: TDirection) => {
       const visibleElements = Math.floor(wrapper.value.clientWidth / (ITEM_WIDTH + GAP))
   
       if (direction === 'right') {
@@ -83,7 +86,18 @@ export default defineComponent({
           idx === wrapper.value.children.length - 1 ? idx - visibleElements - 1 : idx - 1
         )
       }
+    }
 
+    const changeScrollOnMobile = (direction: TDirection) => {
+      idx = Math.min(wrapper.value.children.length - 1, Math.max(idx + (direction === 'right' ? 1 : -1), 0))
+    }
+
+    const changeScroll = (direction: TDirection) => {
+      if (window.innerWidth > MOBILE_WIDTH) {
+        changeScrollOnDesktop(direction);
+      } else {
+        changeScrollOnMobile(direction)
+      }
       wrapper.value.children[idx]?.scrollIntoView({ behavior: 'smooth' })
     }
 
@@ -95,3 +109,9 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped lang="postcss">
+.slide {
+  @apply flex flex-col items-center shrink-0 relative snap-start 420:w-auto w-full;
+}
+</style>
