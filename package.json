@@ -15,7 +15,7 @@
     "vite-plugin-svg-icons": "2.0.1"
   },
   "dependencies": {
-    "@vueuse/core": "8.5.0",
+    "@vueuse/core": "8.9.4",
     "slr-finance-ui-share": "https://github.com/slr-finance/slr-finance-ui-share.git",
     "tailwindcss": "3.0.24"
   }
