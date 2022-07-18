@@ -8,7 +8,7 @@
 import 'virtual:svg-icons-register'
 import './index.postcss'
 import './components/ui/index.postcss'
-import { initReferral } from './libs/referral'
+import { initReferral } from 'slr-finance-ui-share/src/libs/referral'
 import { MetaObject } from '#app'
 
 const route = useRoute()

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@vueuse/core": "8.5.0",
-    "js-cookie": "3.0.1",
+    "slr-finance-ui-share": "https://github.com/slr-finance/slr-finance-ui-share.git",
     "tailwindcss": "3.0.24"
   }
 }
