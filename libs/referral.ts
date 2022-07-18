@@ -2,7 +2,7 @@ import Cookies from 'js-cookie'
 
 export const REFERRER_QUERY_PARAM = 'r'
 export const REFERRER_STORAGE_NAME = 'slr-finance-referrer'
-export const AddressZero = "0x0000000000000000000000000000000000000000"
+export const AddressZero = '0x0000000000000000000000000000000000000000'
 
 const isAddress = (address: string) => {
   return address.match(/^(0x)?[0-9a-fA-F]{40}$/) !== null
@@ -17,7 +17,7 @@ export const initReferral = () => {
     referrer = searchParams.get(REFERRER_QUERY_PARAM)
 
     if (referrer && isAddress(referrer)) {
-      Cookies.set(REFERRER_STORAGE_NAME, referrer, { sameSite: 'Strict', secure: true, domain: '.slr.finance' })
+      Cookies.set(REFERRER_STORAGE_NAME, referrer, { sameSite: 'Strict', secure: true, domain: '.slr.finance', expires: 90 })
     } else {
       referrer = null
     }
