@@ -1,0 +1,11 @@
+node_modules
+*.log*
+.nuxt
+.output
+.nitro
+.cache
+.output
+.env
+dist
+.yarn
+.yarnrc.yml
