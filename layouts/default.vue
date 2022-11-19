@@ -3,7 +3,7 @@
     <app-header />
     <slot/>
 
-    <app-footer />
+    <app-footer/>
   </div>
 </template>
 

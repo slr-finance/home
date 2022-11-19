@@ -1,13 +1,15 @@
 <template>
   <div>
     <home-hero/>
+    <!-- <SlrHeader></SlrHeader> -->
 
-    <div class="mx-ui-page-spacing space-y-[140px]">
+    <div class="mx-ui-page-spacing space-y-[200px]">
       <home-screenshot/>
       <home-token-description/>
       <home-staking-description/>
       <home-milky-way-scheme/>
       <home-road-map/>
+      <div></div>
     </div>
   </div>
 </template>

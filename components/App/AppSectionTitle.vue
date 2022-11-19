@@ -2,23 +2,26 @@
 import { useIntersectionObserver } from '@vueuse/core'
 import { defineComponent, h, VNode } from 'vue'
 
-type TextGroup = { isAccent: boolean, chars: string[] }
+type TextGroup = { isAccent: boolean, chars: string[], isBr: boolean }
 
 const processText = (text: string) => {
-  const groups: TextGroup[] = [{chars: [], isAccent: false}]
+  const groups: TextGroup[] = [{chars: [], isAccent: false, isBr: false}]
   let length = 0
 
   for (let i = 0, isAccent = false; i < text.length; i++) {
     const char = text.charAt(i)
     const isDivider = char === '|'
+    const isBr = char === '⤈'
 
     isAccent = (isAccent && !isDivider) || (!isAccent && isDivider)
     
     let lastGroup = groups[groups.length - 1]
     const needCreateNewGroup = lastGroup.isAccent !== isAccent
-            
-    if (needCreateNewGroup) {
-      lastGroup = {isAccent , chars: []}
+
+    if (isBr) {
+      groups.push({ isAccent: false, chars: [], isBr: true })
+    } else if (needCreateNewGroup) {
+      lastGroup = {isAccent, chars: [], isBr: false}
 
       groups.push(lastGroup)
     } else {
@@ -37,12 +40,19 @@ const processText = (text: string) => {
 const getTextVNodes = (groups: TextGroup[], maxLength: number) => {
   const textVnodes:VNode[] = []
 
-  for (let index = 0, charIndex = 0; index < groups.length && charIndex < maxLength; index++) {
+  for (
+    let index = 0, charIndex = 0; index < groups.length && charIndex < maxLength; index++) {
+    const { isAccent, isBr, chars } = groups[index]
+
+    if (isBr) {
+      textVnodes.push(h('br'))
+    }
+
     textVnodes.push(
-      h('span', { className: `ui-typing-text${groups[index].isAccent ? '-accent' : ''}` }, groups[index].chars.slice(0, Math.max(0, maxLength - charIndex)).join(''))
+      h('span', { className: `ui-typing-text__text${isAccent ? '-accent' : ''}` }, chars.slice(0, Math.max(0, maxLength - charIndex)).join(''))
     )
 
-    charIndex += groups[index].chars.length
+    charIndex += chars.length
   }
 
   return textVnodes
@@ -51,6 +61,10 @@ const getTextVNodes = (groups: TextGroup[], maxLength: number) => {
 export default defineComponent({
   props: {
     text: {
+      /**
+       * ⤈ - Перенос строки
+       * |TEXT| - Выделить текст
+       */
       type: String,
       required: true,
     },
@@ -104,7 +118,7 @@ export default defineComponent({
   
         stop()
       }
-    }, { threshold: 1 })
+    }, { threshold: 0.5 })
 
     return { groups, maxLength, totalTextLength, rootRef }
   },
@@ -115,15 +129,15 @@ export default defineComponent({
 
     return h(
       'div',
-      {
-        ref: (el) => this.rootRef = el,
-      },
       h(
         'div',
-        { className: 'relative' },
+        {
+          className: 'ui-typing-text',
+          ref: (el) => this.rootRef = el, 
+        },
         [
-          h('div', {className: 'absolute'}, textVnodes),
-          h('div', {className: 'opacity-0'}, fullTextVNodes),
+          h('div', {className: 'ui-typing-text-typing'}, textVnodes),
+          h('div', {className: 'ui-typing-text-hidden'}, fullTextVNodes),
         ],
       ),
     )
@@ -132,15 +146,25 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.ui-typing-text-accent,
 .ui-typing-text {
+  @apply relative;
+}
+
+.ui-typing-text-typing {
+  @apply absolute inset-0;
+}
+.ui-typing-text-hidden {
+  @apply invisible opacity-0 select-none pointer-events-none overflow-hidden;
+}
+.ui-typing-text__text-accent,
+.ui-typing-text__text {
   @apply selection:bg-green-atomic selection:bg-opacity-50 selection:text-white;
 }
 
-.ui-typing-text {
+.ui-typing-text__text {
   @apply text-gray;
 }
-.ui-typing-text-accent {
+.ui-typing-text__text-accent {
   @apply text-white;
 }
 </style>

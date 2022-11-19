@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts" setup>
-import 'virtual:svg-icons-register'
+// import 'virtual:svg-icons-register'
 import './index.postcss'
 import './components/ui/index.postcss'
-import '@slr-finance/uikit/dist/style.css'
+import '@slr-finance/uikit/styles'
 import { initReferral } from 'slr-finance-ui-share/src/libs/referral'
 import { MetaObject } from '#app'
 
